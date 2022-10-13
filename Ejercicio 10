@@ -1,0 +1,32 @@
+10) Interrupción por hardware: tecla F10.
+Escribir un programa que, mientras ejecuta un lazo infinito, cuente el 
+número de veces que se presiona la tecla F10 y acumule este valor en 
+el registro DX.
+
+ORG 1000H
+EOI EQU 20H
+IMR EQU 21H
+INT0 EQU 24H
+
+ORG 2000H
+MOV DX, 0
+MOV AX, CONTAR    ;Muevo a AX la direccion de la subrutina
+MOV BX, 40        ;Muevo a BX 4*10 
+MOV [BX], AX      ;Muevo dentro de BX la direccion de la subrutina
+
+CLI
+MOV AL, 11111110b 
+OUT IMR, AL
+MOV AL, 10
+OUT INT0, AL
+STI
+
+LOOP: JMP LOOP
+
+ORG 3000H
+CONTAR: INC DX
+MOV AL, 20H
+OUT EOI, AL
+IRET
+
+END
