@@ -1,0 +1,45 @@
+;7) Escribir un programa que efectúe la suma de dos números (de un dígito cada uno) ingresados por teclado y muestre el
+resultado en la pantalla de comandos. Recordar que el código de cada caracter ingresado no coincide con el número que
+representa y que el resultado puede necesitar ser expresado con 2 dígitos. 
+
+
+ORG 1000H
+num1 db ?
+num2 db ?
+res db ?
+msj db "Ingrese un numero de un digito:"
+fin db ?
+negat db "-"
+
+ORG 2000H
+mov bx, offset msj
+mov al, offset fin - offset msj
+int 7
+mov bx, offset num1
+int 6
+mov dl, num1
+mov bx, offset msj
+int 7
+mov bx, offset num2
+int 6
+sub dl, num2
+JS NEGATIVO
+JNS POSITIVO
+
+NEGATIVO: mov res, dl
+          mov bx, offset negat
+          mov al, 1
+          int 7
+          mov bx, offset res
+          mov al, 1
+          int 7
+          jmp final
+
+POSITIVO: mov res, dl
+          mov bx, offset res
+          mov al, 1
+          int 7
+          jmp final
+          
+final: int 0
+       end
