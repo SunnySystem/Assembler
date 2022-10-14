@@ -1,0 +1,52 @@
+;a)Escribir un programa para imprimir la letra “A” utilizando la impresora a través de la PIO. 
+
+Org 1000H
+PA EQU 30H
+PB EQU 31H
+CA EQU 32H
+CB EQU 33H
+
+CHAIN db "ORGANIZACION DE COMPUTADORAS"
+
+ORG 3000H
+CONF_PIO: MOV AL, 00000001b ;BUSY = 1
+          OUT CA, AL
+          MOV AL, 00000000b ;DATOS = 0
+          OUT CB, AL
+          RET
+          
+ORG 3100H
+POLL: IN AL, PA
+      AND AL, 1
+      JNZ POLL
+      RET
+
+ORG 3200H
+STROBE_0: IN AL, PA
+          AND AL, 11111101b
+          OUT PA, AL
+          RET
+
+ORG 3300H
+STROBE_1: IN AL, PA
+          OR AL, 00000010b
+          OUT PA, AL
+          RET
+
+ORG 2000H
+CALL CONF_PIO
+CALL STROBE_0
+
+MOV BX, OFFSET CHAIN
+MOV CL, 21
+
+LOOP: CALL POLL
+      MOV AL, [BX]
+      OUT PB, AL
+      CALL STROBE_1
+      CALL STROBE_0
+      INC BX
+      DEC CL
+      JNZ LOOP
+INT 0
+END
