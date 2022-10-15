@@ -1,5 +1,5 @@
 ;Escribir un programa que imprime “INGENIERIA E INFORMATICA” en la impresora a través del 
-;HAND-SHAKE. La comunicación se establece por consulta de estado (polling).
+;HAND-SHAKE. La comunicación se establece por consulta de estado (polling)
 
 DATO EQU 40H
 ESTADO EQU 41H
@@ -11,6 +11,10 @@ FIN DB ?
 ORG 2000H
 MOV BX, OFFSET STR
 MOV CL, OFFSET FIN - OFFSET STR
+
+IN AL, ESTADO
+AND AL, 01111111b
+OUT ESTADO, AL
 
 LOOP:IN AL, ESTADO
     AND AL, 1
