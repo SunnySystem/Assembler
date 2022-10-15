@@ -14,11 +14,13 @@ IMPRIMIR: PUSH AX
           MOV AL, [BX]
           OUT DATO, AL
           INC BX
-          
-          MOV AL, 20H
-          OUT EOI, AL
-          POP AX
-          IRET
+          DEC CL
+          JNZ FINAL
+
+FINAL: MOV AL, 20H
+       OUT EOI, AL
+       POP AX
+       IRET
 
 
 ORG 2000H
@@ -41,8 +43,8 @@ IN AL, ESTADO
 OR AL, 10000000b
 OUT ESTADO, AL
 
-POLL: CMP BX, OFFSET FIN
-JNZ POLL
+LAZO: CMP CL, 0
+JNZ LAZO
 
 IN AL, ESTADO
 AND AL, 01111111b
