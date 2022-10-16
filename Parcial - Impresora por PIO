@@ -1,0 +1,70 @@
+PA EQU 30H ;Estado
+PB EQU 31H ;Datos
+CA EQU 32H ;Conf
+CB EQU 33H ;Conf
+
+ORG 1000H
+CADENA DB "T(Elzxkf213!$f%!.oiasdaR.SJDHlm97/(09wjSdD"
+FIN DB ?
+A DB 41H
+Z DB 5AH
+
+ORG 3000H
+
+CONF_PIO: MOV AL, 00000001b
+          OUT PA, AL
+          RET
+          
+          MOV AL, 00000000b
+          OUT PB, AL
+          RET
+
+STROBE_0: IN AL, PA
+          AND AL, 11111101b
+          OUT PA, AL
+          RET
+
+STROBE_1: IN AL, PA
+          OR AL, 00000010b
+          OUT PA, AL
+          RET
+
+POLL: IN AL, PA
+      AND AL, 1
+      JNZ POLL
+      RET
+
+ORG 2000H
+CALL CONF_PIO
+CALL STROBE_0
+
+MOV BX, OFFSET CADENA
+MOV CL, OFFSET FIN - OFFSET CADENA
+
+
+LAZO: CMP CL, 0
+      JZ FINAL
+      MOV AL, [BX]
+      CMP AL, A
+      JS ES_MAYUS
+      JNS NO_ES
+      CMP Z, AL
+      JS ES_MAYUS
+      JNS NO_ES
+      RET
+
+ES_MAYUS: CALL POLL
+          CALL STROBE_0
+          OUT PB, AL
+          CALL STROBE_1
+          INC BX
+          DEC CL
+          RET
+ 
+NO_ES: INC BX
+       DEC CL
+       JMP LAZO
+       RET
+
+FINAL: INT 0
+END
