@@ -1,0 +1,48 @@
+DATO EQU 40H
+ESTADO EQU 41H
+
+ORG 1000H
+CADENA DB "T(Elzxkf213!$f%!.oiasdaR.SJDHlm97/(09wjSdD"
+FIN DB ?
+A DB 41H
+Z DB 5AH
+
+
+ORG 3000H
+
+POLL: IN AL, ESTADO
+      AND AL, 1
+      JNZ POLL
+      RET
+
+
+ORG 2000H
+IN AL, ESTADO
+AND AL, 01111111b
+OUT ESTADO, AL ;conf handshake por consulta de estado.
+
+MOV AL, 00000000b
+OUT DATO, AL
+
+MOV BX, OFFSET CADENA
+MOV CL, OFFSET FIN - OFFSET CADENA
+
+LAZO: CMP CL, 0
+      JZ FINAL
+      CALL POLL
+      MOV AL, [BX]
+      CMP AL, A
+JNS ES_MAYUS
+      CMP Z, AL
+JS ES_MAYUS
+     INC BX
+     DEC CL
+     JMP LAZO
+
+ES_MAYUS: OUT DATO, AL
+          INC BX
+          DEC CL
+          JMP LAZO
+
+FINAL: INT 0
+END
