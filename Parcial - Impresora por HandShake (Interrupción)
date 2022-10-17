@@ -1,0 +1,56 @@
+EOI EQU 20H
+IMR EQU 21H
+INT2 EQU 26H
+DATO EQU 40H
+ESTADO EQU 41H
+
+ORG 1000H
+CADENA DB "T(Elzxkf213!$f%!.oiasdaR.SJDHlm97/(09wjSdD"
+FIN DB ?
+ID DB 10
+A DB 41H
+Z DB 5AH
+
+ORG 40H
+DIR_RUT_HND DW 3500h
+
+ORG 3000H
+SELECCIONADO:MOV DL, 0
+             MOV AL, [BX]
+             CMP AL, A
+JS FINAL
+             CMP AL, Z
+JNS FINAL
+            MOV DL, 1
+FINAL:RET
+
+ORG 3500H
+RUT_HND: CALL SELECCIONADO
+         CMP DL, 1
+         JNZ NO_IMP
+         OUT DATO, AL
+NO_IMP: INC BX
+        DEC CL
+        MOV AL, 20H
+        OUT EOI, AL
+        IRET
+
+ORG 2000H
+CLI
+MOV AL, 11111101b
+OUT IMR, AL ;Habilitamos el Handshake
+
+MOV AL, 10
+OUT INT2, AL ;Enviamos el ID
+
+IN AL, ESTADO
+OR AL, 10000000b
+OUT ESTADO, AL ;Habilitamos las interrupciones
+
+MOV BX, OFFSET CADENA
+MOV CL, OFFSET FIN - OFFSET CADENA
+STI
+
+loop: jmp loop
+Int 0
+END
